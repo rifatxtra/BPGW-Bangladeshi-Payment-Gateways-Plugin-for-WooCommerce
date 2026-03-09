@@ -1,0 +1,8 @@
+@import "tailwindcss/theme" prefix(bpgw);
+@import "tailwindcss/utilities" prefix(bpgw);
+
+@source "../templates/**/*.php";
+
+@utility test {
+    color: red;
+}

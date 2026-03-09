@@ -1,0 +1,26 @@
+{
+  "name": "bangladesh-payment-gateways-woocommerce",
+  "version": "1.0.0",
+  "description": "Bangladeshi payment gateways (bKash, SSLCommerz or others) for WooCommerce.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx @tailwindcss/cli -i ./assets/tailwind.css -o ./assets/css/style.css --watch",
+    "build": "npx @tailwindcss/cli -i ./assets/tailwind.css -o ./assets/css/style.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rifatxtra/BPGW-Bangladeshi-Payment-Gateways-for-WooCommerce.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/rifatxtra/BPGW-Bangladeshi-Payment-Gateways-for-WooCommerce/issues"
+  },
+  "homepage": "https://github.com/rifatxtra/BPGW-Bangladeshi-Payment-Gateways-for-WooCommerce#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.1",
+    "tailwindcss": "^4.2.1"
+  }
+}
