@@ -1,8 +1,9 @@
 <?php
+
 /**
- * Plugin Name: BPGW - Bangladeshi Payment Gateways for WooCommerce
- * Plugin URI:  https://github.com/rifatxtra/BPGW-Bangladeshi-Payment-Gateways-for-WooCommerce
- * Description: Bangladeshi payment gateways (bKash, SSLCommerz or others) for WooCommerce.
+ * Plugin Name: BPGW - Bangladeshi Payment Gateways Plugin for WooCommerce
+ * Plugin URI:  https://bpgw.rifatxtra.com/
+ * Description: Bangladeshi payment gateways Plugin (bKash, SSLCommerz or others) for WooCommerce.
  * Version:     1.0.0
  * Author:      Md. Rashedul Islam
  * Author URI:  https://rifatxtra.com/
@@ -37,9 +38,9 @@ spl_autoload_register(function (string $class): void {
 
 
 //bootstrap the plugin
-add_action('plugins_loaded', function(): void {
+add_action('plugins_loaded', function (): void {
     if (!class_exists('WooCommerce')) {
-        add_action('admin_notices', function(): void {
+        add_action('admin_notices', function (): void {
             echo '<div class="notice notice-error"><p>';
             echo '<strong>BPGW:</strong> WooCommerce must be active.';
             echo '</p></div>';

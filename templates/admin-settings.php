@@ -22,8 +22,7 @@ $sandbox = get_option('bpgw_sandbox_mode', false);
                         id="bpgw_sandbox_mode"
                         name="bpgw_sandbox_mode"
                         value="1"
-                        <?php checked($sandbox, true); ?>
-                    >
+                        <?php checked($sandbox, true); ?>>
                     <span class="bpgw:font-medium">Enable Sandbox Mode</span>
                 </label>
 
@@ -34,8 +33,7 @@ $sandbox = get_option('bpgw_sandbox_mode', false);
                 <button
                     type="submit"
                     id="bpgw-save-btn"
-                    class="bpgw:mt-6 bpgw:bg-blue-600 bpgw:text-white bpgw:px-5 bpgw:py-2 bpgw:rounded bpgw:cursor-pointer"
-                >
+                    class="bpgw:mt-6 bpgw:bg-blue-600 bpgw:text-white bpgw:px-5 bpgw:py-2 bpgw:rounded bpgw:cursor-pointer">
                     Save Settings
                 </button>
 
@@ -60,18 +58,18 @@ $sandbox = get_option('bpgw_sandbox_mode', false);
 
             <div class="bpgw:flex bpgw:flex-col bpgw:gap-3">
                 <a href="https://github.com/rifatxtra/BPGW-Bangladeshi-Payment-Gateways-for-WooCommerce"
-                   target="_blank"
-                   class="bpgw:text-sm bpgw:text-blue-600">
+                    target="_blank"
+                    class="bpgw:text-sm bpgw:text-blue-600">
                     ⭐ Star on GitHub
                 </a>
                 <a href="https://github.com/rifatxtra/BPGW-Bangladeshi-Payment-Gateways-for-WooCommerce/issues"
-                   target="_blank"
-                   class="bpgw:text-sm bpgw:text-blue-600">
+                    target="_blank"
+                    class="bpgw:text-sm bpgw:text-blue-600">
                     🐛 Report an Issue
                 </a>
                 <a href="https://github.com/rifatxtra/BPGW-Bangladeshi-Payment-Gateways-for-WooCommerce/blob/main/CONTRIBUTING.md"
-                   target="_blank"
-                   class="bpgw:text-sm bpgw:text-blue-600">
+                    target="_blank"
+                    class="bpgw:text-sm bpgw:text-blue-600">
                     🤝 Contribute
                 </a>
             </div>
