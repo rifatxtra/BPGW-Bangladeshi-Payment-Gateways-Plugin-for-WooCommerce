@@ -16,7 +16,7 @@ Supports **bKash** and **SSLCommerz** with a clean hosted payment flow.
 |---|---|---|
 | bKash | ✅ Live | Hosted Payment Flow |
 | SSLCommerz | ✅ Live | Hosted Payment Flow |
-| Manual Payment | ✅ Live | Personal Account Payment |
+| Manual Payment | 🔜 Coming Soon | Personal Account Payment |
 | Nagad | 🔜 Coming Soon | — |
 | Rocket | 🔜 Coming Soon | — |
 | Upay | 🔜 Coming Soon | — |
@@ -132,6 +132,8 @@ Fail URL:    https://yoursite.com/?wc-api=bpgw_sslcommerz_callback
 Cancel URL:  https://yoursite.com/?wc-api=bpgw_sslcommerz_callback
 IPN URL:     https://yoursite.com/?wc-api=bpgw_sslcommerz_ipn
 ```
+
+On callback, the plugin validates order ownership and gateway match, ignores already-paid orders, handles explicit failed/cancelled statuses, and then verifies the transaction server-to-server before marking the order paid.
 
 ---
 

@@ -38,7 +38,7 @@ class CallbackController
                 'bKash callback skipped — payment method mismatch for order ' . $order_id,
                 ['source' => 'bpgw-bkash']
             );
-            wp_redirect($order->get_checkout_order_received_url());
+            wp_redirect(wc_get_checkout_url());
             exit;
         }
 
@@ -91,16 +91,43 @@ class CallbackController
     public static function handleSSLCommerz(): void
     {
         // Read callback parameters from the query string.
-        $order_id = isset($_GET['order_id']) ? absint($_GET['order_id']) : 0;
-        $tran_id  = isset($_GET['tran_id']) ? sanitize_text_field($_GET['tran_id']) : '';
+        $order_id  = isset($_GET['order_id']) ? absint($_GET['order_id']) : 0;
+        $tran_id   = isset($_GET['tran_id']) ? sanitize_text_field($_GET['tran_id']) : '';
+        $statusRaw = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
+        $status    = strtolower($statusRaw);
 
         $logger = wc_get_logger();
-        $logger->debug('SSLCommerz callback received — order_id: ' . $order_id . ' | tran_id: ' . $tran_id, ['source' => 'bpgw-sslcommerz']);
+        $logger->debug(
+            'SSLCommerz callback received — order_id: ' . $order_id . ' | tran_id: ' . $tran_id . ' | status: ' . $status,
+            ['source' => 'bpgw-sslcommerz']
+        );
 
         $order = wc_get_order($order_id);
 
         if (!$order) {
+            $logger->warning('SSLCommerz callback failed — invalid order_id: ' . $order_id, ['source' => 'bpgw-sslcommerz']);
             wp_redirect(wc_get_checkout_url());
+            exit;
+        }
+
+        if ($order->get_payment_method() !== 'bpgw_sslcommerz') {
+            $logger->warning(
+                'SSLCommerz callback skipped — payment method mismatch for order ' . $order_id,
+                ['source' => 'bpgw-sslcommerz']
+            );
+            wp_redirect(wc_get_checkout_url());
+            exit;
+        }
+
+        if ($order->is_paid()) {
+            $logger->debug('SSLCommerz callback ignored — order already paid: ' . $order_id, ['source' => 'bpgw-sslcommerz']);
+            wp_redirect($order->get_checkout_order_received_url());
+            exit;
+        }
+
+        if (in_array($status, ['failed', 'failure', 'cancel', 'canceled', 'cancelled'], true)) {
+            $order->update_status('failed', 'SSLCommerz payment cancelled or failed.');
+            wp_redirect($order->get_cancel_order_url());
             exit;
         }
 

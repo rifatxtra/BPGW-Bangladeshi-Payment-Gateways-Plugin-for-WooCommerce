@@ -469,7 +469,7 @@ bKash redirects with status=cancel
         ↓
 CallbackController detects cancel/cancelled/canceled/failure
         ↓
-$order->update_status('failed', 'bKash payment cancelled.')
+$order->update_status('failed', 'bKash payment cancelled or failed.')
         ↓
 Redirect to cart/cancel URL
 ```
@@ -486,17 +486,18 @@ Redirect to cart/cancel URL
 5. Customer pays on SSLCommerz hosted page
 6. SSLCommerz POSTs to success_url/fail_url/cancel_url
 7. CallbackController::handleSSLCommerz() runs
-8. Reads tran_id from callback query
-9. SSLCommerzService::verifyPayment($tran_id)
+8. Validates order, payment method, already-paid state, callback status, and tran_id
+9. For fail/cancel statuses, marks order failed and exits
+10. SSLCommerzService::verifyPayment($tran_id)
    GET /validator/api/merchantTransIDvalidationAPI.php?tran_id=xxx
    Response: { status: "VALID" }
-10. $order->payment_complete($tran_id)
-11. Redirect to order received page
+11. $order->payment_complete($tran_id)
+12. Redirect to order received page
 ```
 
 ### SSLCommerz Callback Notes
 
-Current implementation verifies using `tran_id` from callback query and then validates via merchant transaction validation API.
+Current implementation verifies using `tran_id` from callback query and validates via merchant transaction validation API. It also protects against payment-method mismatch and duplicate callback processing for already-paid orders.
 
 ---
 
