@@ -8,7 +8,7 @@ class Plugin
 {
 
     private static ?Plugin $instance = null;
-    //singleton instance
+
     public static function boot(): void
     {
         if (self::$instance !== null) {
@@ -22,8 +22,26 @@ class Plugin
 
     private function registerHooks(): void
     {
-        //register gateways
+        // Register all payment gateways.
         add_filter('woocommerce_payment_gateways', [GatewayManager::class, 'register']);
+
+        // Register callback endpoint for bKash.
+        add_action(
+            'woocommerce_api_bpgw_bkash_callback',
+            [\BPGW\Controllers\CallbackController::class, 'handleBkash']
+        );
+
+        // Register callback endpoint for SSLCommerz.
+        add_action(
+            'woocommerce_api_bpgw_sslcommerz_callback',
+            [\BPGW\Controllers\CallbackController::class, 'handleSSLCommerz']
+        );
+
+        // Register Checkout Block support for both gateways.
+        add_action('woocommerce_blocks_payment_method_type_registration', function ($registry) {
+            $registry->register(new \BPGW\Gateways\Blocks\BkashBlockSupport());
+            $registry->register(new \BPGW\Gateways\Blocks\SSLCommerzBlockSupport());
+        });
 
         if (is_admin()) {
             add_action('admin_menu', [$this, 'registerAdminMenu']);
@@ -33,22 +51,22 @@ class Plugin
     }
 
 
-    //register admin menu for plugin settings
+    // Add the plugin settings page to the admin menu.
     public function registerAdminMenu(): void
     {
         add_menu_page(
-            'BPGW Settings',  // Page title
-            'BPGW',           // Sidebar label
-            'manage_options', // Who can see it (admin only)
-            'bpgw-settings',  // Slug used in URL
-            [$this, 'renderAdminPage'], // Callback
-            'dashicons-money-alt', // Icon
-            58 // Position
+            'BPGW Settings',
+            'BPGW',
+            'manage_options',
+            'bpgw-settings',
+            [$this, 'renderAdminPage'],
+            'dashicons-money-alt',
+            58
         );
     }
 
 
-    //enqueue admin assets for plugin settings page
+    // Load admin assets only on the plugin settings page.
     public function enqueueAdminAssets(string $hook): void
     {
         if ($hook !== 'toplevel_page_bpgw-settings') {
@@ -76,7 +94,7 @@ class Plugin
         ]);
     }
 
-    // render admin page for plugin settings
+    // Render the plugin settings page.
     public function renderAdminPage(): void
     {
         include BPGW_PATH . 'templates/admin-settings.php';

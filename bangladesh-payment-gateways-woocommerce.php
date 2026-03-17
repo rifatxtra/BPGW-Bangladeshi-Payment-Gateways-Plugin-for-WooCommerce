@@ -50,3 +50,4 @@ add_action('plugins_loaded', function (): void {
 
     \BPGW\Core\Plugin::boot();
 });
+
