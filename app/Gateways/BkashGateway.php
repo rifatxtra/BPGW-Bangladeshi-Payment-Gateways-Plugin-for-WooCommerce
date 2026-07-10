@@ -55,8 +55,7 @@ class BkashGateway extends \WC_Payment_Gateway
         ], home_url('/'));
 
         $bkashUrl = $service->createPayment(
-            (string) $order_id,
-            (float)  $order->get_total(),
+            $order,
             $callbackUrl
         );
 

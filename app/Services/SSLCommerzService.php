@@ -28,6 +28,18 @@ class SSLCommerzService
             : 'https://securepay.sslcommerz.com';
     }
 
+    // Apply strict TLS verification using the CA bundle shipped with WordPress.
+    private function applyTls($ch): void
+    {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+        $caBundle = ABSPATH . WPINC . '/certificates/ca-bundle.crt';
+        if (file_exists($caBundle)) {
+            curl_setopt($ch, CURLOPT_CAINFO, $caBundle);
+        }
+    }
+
     // Create a payment and return the hosted gateway URL.
     public function createPayment(
         string   $orderId,
@@ -90,7 +102,7 @@ class SSLCommerzService
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $this->applyTls($ch);
 
         $response  = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -129,8 +141,8 @@ class SSLCommerzService
         return ['result' => 'error', 'message' => 'HTTP ' . $http_code];
     }
 
-    // Verify payment using the SSLCommerz transaction ID.
-    public function verifyPayment(string $tran_id): bool
+    // Verify payment using the SSLCommerz transaction ID, ensuring it matches the order.
+    public function verifyPayment(string $tran_id, \WC_Order $order): bool
     {
         $validation_url  = $this->baseUrl() . '/validator/api/merchantTransIDvalidationAPI.php';
         $validation_url .= '?tran_id='     . urlencode($tran_id);
@@ -141,8 +153,8 @@ class SSLCommerzService
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $validation_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $this->applyTls($ch);
 
         $response  = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -175,7 +187,19 @@ class SSLCommerzService
                 $element = $result['element'][0];
                 $status = $element['status'] ?? '';
 
-                if (in_array($status, ['VALID', 'VALIDATED'])) {
+                if (in_array($status, ['VALID', 'VALIDATED'], true)) {
+                    // Order binding: the transaction must be the one generated for this order.
+                    // The amount is not re-checked here: SSLCommerz charges the exact amount
+                    // supplied at payment creation, which we control.
+                    $storedTran = $order->get_meta('_bpgw_sslcommerz_tran_id');
+                    if ($storedTran && $storedTran !== $tran_id) {
+                        $logger->warning(
+                            'SSLCommerz tran_id mismatch — expected ' . $storedTran . ', got ' . $tran_id,
+                            ['source' => 'bpgw-sslcommerz']
+                        );
+                        return false;
+                    }
+
                     $logger->debug(
                         'SSLCommerz payment verified. Transaction ID: ' . $tran_id . ' | Status: ' . $status,
                         ['source' => 'bpgw-sslcommerz']

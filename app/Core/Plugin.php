@@ -43,6 +43,13 @@ class Plugin
             $registry->register(new \BPGW\Gateways\Blocks\SSLCommerzBlockSupport());
         });
 
+        // Reconcile unpaid orders whose gateway callback never arrived.
+        add_action('bpgw_reconcile_pending', [\BPGW\Controllers\ReconcileController::class, 'run']);
+
+        if (!wp_next_scheduled('bpgw_reconcile_pending')) {
+            wp_schedule_event(time() + HOUR_IN_SECONDS, 'hourly', 'bpgw_reconcile_pending');
+        }
+
         if (is_admin()) {
             add_action('admin_menu', [$this, 'registerAdminMenu']);
             add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);

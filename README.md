@@ -10,6 +10,23 @@ Supports **bKash** and **SSLCommerz** with a clean hosted payment flow.
 
 ---
 
+## Changelog
+
+### 1.0.1
+
+- **Security:** Callbacks now verify the returned payment/transaction against the originating order (bKash `merchantInvoiceNumber`, SSLCommerz `tran_id`) so a transaction from one order can no longer complete a different order.
+- **Security:** Enabled strict TLS certificate verification on all bKash and SSLCommerz API calls (previously disabled), using the CA bundle shipped with WordPress.
+- **Security:** The settings AJAX handler now requires the `manage_options` capability and sanitizes the nonce.
+- **Security:** Stopped writing sensitive data (bKash access token, callback signature) to the logs.
+- **Fix:** bKash access token is now cached separately per mode (sandbox/live) and per app key, so switching mode or credentials no longer reuses a stale token.
+- **New:** Hourly reconciliation job that re-validates recent unpaid orders whose gateway callback never arrived (e.g. the customer closed the browser after paying) and completes them automatically.
+
+### 1.0.0
+
+- Initial release with bKash and SSLCommerz hosted payment support, WooCommerce Blocks checkout, and admin settings.
+
+---
+
 ## Supported Gateways
 
 | Gateway | Status | Type |

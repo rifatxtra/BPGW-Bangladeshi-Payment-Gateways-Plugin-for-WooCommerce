@@ -19,8 +19,6 @@ class CallbackController
         $logger->debug(
             'bKash callback received — order_id: ' . $order_id .
             ' | status: ' . $status .
-            ' | paymentID: ' . $paymentId .
-            ' | signature: ' . $signature .
             ' | apiVersion: ' . $apiVersion,
             ['source' => 'bpgw-bkash']
         );
@@ -72,7 +70,7 @@ class CallbackController
             $sandbox
         );
 
-        $verified = $service->verifyPayment($paymentId);
+        $verified = $service->verifyPayment($paymentId, $order);
 
         if ($verified) {
             $order->payment_complete($paymentId);
@@ -146,7 +144,7 @@ class CallbackController
             $sandbox
         );
 
-        $verified = $service->verifyPayment($tran_id);
+        $verified = $service->verifyPayment($tran_id, $order);
 
         if ($verified) {
             $order->payment_complete($tran_id);

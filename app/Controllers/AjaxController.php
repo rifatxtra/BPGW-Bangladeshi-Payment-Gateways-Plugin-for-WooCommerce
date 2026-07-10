@@ -9,8 +9,15 @@ class AjaxController
     public static function saveSettings(): void
     {
         // Reject requests with an invalid nonce.
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'bpgw_admin_nonce')) {
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce, 'bpgw_admin_nonce')) {
             wp_send_json_error(['message' => 'Invalid nonce.']);
+            return;
+        }
+
+        // Only administrators may change gateway settings.
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions.']);
             return;
         }
 
